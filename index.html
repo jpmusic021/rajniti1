@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="gu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ભારતીય રાજનીતિ ક્વિઝ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Vadodara:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Hind Vadodara', sans-serif;
+            background-color: #e0f7fa; /* Light Blue Background */
+            color: #004d40;
+        }
+        .quiz-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: white;
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            border: 1px solid #b2ebf2;
+        }
+        .option-btn {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 0.75rem 1.5rem;
+            margin-bottom: 0.75rem;
+            border: 2px solid #4dd0e1;
+            border-radius: 0.5rem;
+            background-color: #ffffff;
+            color: #006064;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .option-btn:hover:not(:disabled) {
+            background-color: #b2ebf2;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+        }
+        .option-btn.correct {
+            background-color: #66bb6a; /* Green */
+            border-color: #388e3c;
+            color: white;
+        }
+        .option-btn.incorrect {
+            background-color: #ef5350; /* Red */
+            border-color: #d32f2f;
+            color: white;
+        }
+        .option-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.8;
+        }
+        .explanation {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background-color: #f1f8e9;
+            border-left: 5px solid #8bc34a;
+            border-radius: 0.5rem;
+            color: #33691e;
+        }
+        .nav-btn {
+            padding: 0.6rem 1.5rem;
+            border-radius: 0.5rem;
+            background-color: #00796b;
+            color: white;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .nav-btn:hover {
+            background-color: #004d40;
+        }
+        .nav-btn:disabled {
+            background-color: #9e9e9e;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen">
+
+    <div class="quiz-container">
+        <div class="flex justify-between items-center mb-6">
+            <div id="score" class="text-xl font-bold bg-teal-100 text-teal-800 px-4 py-2 rounded-lg">સ્કોર: 0</div>
+            <div id="question-counter" class="text-lg font-semibold text-gray-600"></div>
+        </div>
+
+        <div id="question-container" class="mb-6">
+            <h2 id="question-text" class="text-2xl font-semibold mb-4">પ્રશ્ન અહીં લોડ થશે...</h2>
+            <div id="options-container"></div>
+        </div>
+
+        <div id="explanation-container" class="hidden">
+            <h3 class="text-xl font-bold mb-2">સમજૂતી</h3>
+            <p id="explanation-text"></p>
+        </div>
+
+        <div class="flex justify-between mt-8">
+            <button id="prev-btn" class="nav-btn">પહેલાનો</button>
+            <button id="next-btn" class="nav-btn">પછીનો</button>
+        </div>
+    </div>
+
+    <script>
+        // Data extracted and translated from the PDF
+        const quizData = [
+            {
+                "question": "1925માં કેન્દ્રીય વિધાનસભાના પ્રથમ ચૂંટાયેલા અધ્યક્ષ કોણ બન્યા હતા?",
+                "options": ["વિઠ્ઠલભાઈ પટેલ", "ડૉ. રાજેન્દ્ર પ્રસાદ", "જવાહરલાલ નેહરુ", "એમ. એન. રોય"],
+                "answer": "વિઠ્ઠલભાઈ પટેલ",
+                "explanation": "વિઠ્ઠલભાઈ પટેલ 1925માં કેન્દ્રીય વિધાનસભાના પહેલા ચૂંટાયેલા અધ્યક્ષ બન્યા હતા; તેઓ સ્વરાજ પાર્ટીના સહ-સ્થાપક અને સરદાર પટેલના મોટા ભાઈ હતા."
+            },
+            {
+                "question": "બંધારણ અપનાવવામાં આવ્યું તે સમયે તેમાં કુલ કેટલા અનુચ્છેદ હતા?",
+                "options": ["395", "448", "250", "350"],
+                "answer": "395",
+                "explanation": "ભારતીય બંધારણને 26 નવેમ્બર 1949ના રોજ અપનાવવામાં આવ્યું, જેમાં પ્રારંભમાં 395 અનુચ્છેદ, 8 અનુસૂચિઓ અને 22 ભાગ હતા."
+            },
+            {
+                "question": "સ્વતંત્રતા પછી બંધારણ સભાના અધ્યક્ષ કોણ હતા?",
+                "options": ["ડૉ. રાજેન્દ્ર પ્રસાદ", "ડૉ. બી. આર. આંબેડકર", "સચ્ચિદાનંદ સિંહા", "જવાહરલાલ નેહરુ"],
+                "answer": "ડૉ. રાજેન્દ્ર પ્રસાદ",
+                "explanation": "ડૉ. રાજેન્દ્ર પ્રસાદ 11 ડિસેમ્બર 1946ના રોજ બંધારણ સભાના પ્રથમ સ્થાયી અધ્યક્ષ તરીકે ચૂંટાયા હતા."
+            },
+            {
+                "question": "કોણ ભારતીય બંધારણની મુસદ્દા સમિતિના સભ્ય નહોતા?",
+                "options": ["એ. વી. ઠક્કર", "ડૉ. બી. આર. આંબેડકર", "અલ્લાદી કૃષ્ણસ્વામી ઐયર", "કે. એમ. મુનશી"],
+                "answer": "એ. વી. ઠક્કર",
+                "explanation": "એ. વી. ઠક્કર મુસદ્દા સમિતિના સભ્ય નહોતા; સમિતિમાં કુલ સાત સભ્યો હતા, જેના અધ્યક્ષ ડૉ. બી. આર. આંબેડકર હતા."
+            },
+            {
+                "question": "પં. જવાહરલાલ નેહરુએ 'ઉદ્દેશ્ય પ્રસ્તાવ' બંધારણ સભામાં ક્યારે રજૂ કર્યો હતો?",
+                "options": ["13 ડિસેમ્બર, 1946", "9 ડિસેમ્બર, 1946", "26 નવેમ્બર, 1949", "29 ઓગસ્ટ, 1947"],
+                "answer": "13 ડિસેમ્બર, 1946",
+                "explanation": "બંધારણ સભામાં 13 ડિસેમ્બર 1946ના રોજ જવાહરલાલ નેહરુએ ઉદ્દેશ્ય પ્રસ્તાવ રજૂ કર્યો, જેનાથી બંધારણ નિર્માણની દિશા નક્કી થઈ."
+            },
+            {
+                "question": "ભારતીય બંધારણ પર લગભગ કેટલા વર્ષોની વિચાર-વિમર્શ પછી હસ્તાક્ષર કરવામાં આવ્યા હતા?",
+                "options": ["લગભગ 3 વર્ષ", "લગભગ 2 વર્ષ", "લગભગ 4 વર્ષ", "લગભગ 1 વર્ષ"],
+                "answer": "લગભગ 3 વર્ષ",
+                "explanation": "બંધારણ પર હસ્તાક્ષર 2 વર્ષ, 11 મહિના અને 18 દિવસના વિચાર-વિમર્શ પછી કરવામાં આવ્યા; પ્રારૂપ સમિતિની રચના 29 ઓગસ્ટ 1947ના રોજ થઈ હતી."
+            },
+            {
+                "question": "સ્વતંત્ર ભારતના પ્રથમ વિદેશ મંત્રી કોણ હતા?",
+                "options": ["જવાહરલાલ નેહરુ", "સરદાર પટેલ", "લાલ બહાદુર શાસ્ત્રી", "ગુલઝારીલાલ નંદા"],
+                "answer": "જવાહરલાલ નેહરુ",
+                "explanation": "સ્વતંત્ર ભારતના પહેલા વિદેશ મંત્રી જવાહરલાલ નેહરુ હતા; તેઓ વડાપ્રધાન પણ હતા."
+            },
+            {
+                "question": "ભારતીય બંધારણની મુસદ્દા સમિતિની રચના ક્યારે કરવામાં આવી હતી?",
+                "options": ["29 ઓગસ્ટ, 1947", "15 ઓગસ્ટ, 1947", "26 જાન્યુઆરી, 1950", "9 ડિસેમ્બર, 1946"],
+                "answer": "29 ઓગસ્ટ, 1947",
+                "explanation": "બંધારણ સભા દ્વારા 29 ઓગસ્ટ 1947ના રોજ મુસદ્દા સમિતિ (Drafting Committee)ની રચના કરવામાં આવી, જેના અધ્યક્ષ ડૉ. બી. આર. આંબેડકર હતા."
+            },
+            {
+                "question": "ભારતમાં બંધારણ સભાનો વિચાર સૌથી પહેલા કોણે રજૂ કર્યો હતો?",
+                "options": ["એમ. એન. રોય", "મહાત્મા ગાંધી", "જવાહરલાલ નેહરુ", "બી. આર. આંબેડકર"],
+                "answer": "એમ. એન. રોય",
+                "explanation": "1934માં એમ. એન. રોયે ભારતમાં બંધારણ સભાની અવધારણા પહેલીવાર રજૂ કરી હતી."
+            },
+            {
+                "question": "બંધારણ સભાના ઉપાધ્યક્ષ કોણ હતા?",
+                "options": ["હરેન્દ્ર કુમાર મુખર્જી", "ડૉ. રાજેન્દ્ર પ્રસાદ", "સચ્ચિદાનંદ સિંહા", "જી. વી. માવળંકર"],
+                "answer": "હરેન્દ્ર કુમાર મુખર્જી",
+                "explanation": "ડૉ. રાજેન્દ્ર પ્રસાદ બંધારણ સભાના અધ્યક્ષ અને હરેન્દ્ર કુમાર મુખર્જી ઉપાધ્યક્ષ તરીકે ચૂંટાયા હતા."
+            },
+            {
+                "question": "1947 પહેલા ભારતમાં 26 જાન્યુઆરીને શું કહેવામાં આવતું હતું?",
+                "options": ["સ્વતંત્રતા દિવસ", "ગણતંત્ર દિવસ", "પૂર્ણ સ્વરાજ દિવસ", "શહીદ દિવસ"],
+                "answer": "સ્વતંત્રતા દિવસ",
+                "explanation": "26 જાન્યુઆરી 1930ના રોજ 'પૂર્ણ સ્વરાજ'ની ઘોષણા થઈ હતી અને ત્યારથી સ્વતંત્રતા પ્રાપ્તિ સુધી તેને સ્વતંત્રતા દિવસ તરીકે મનાવવામાં આવ્યો."
+            },
+            {
+                "question": "'ભારતીય બંધારણના જનક' તરીકે કોને ઓળખવામાં આવે છે?",
+                "options": ["ડૉ. ભીમરાવ આંબેડકર", "મહાત્મા ગાંધી", "ડૉ. રાજેન્દ્ર પ્રસાદ", "સરદાર પટેલ"],
+                "answer": "ડૉ. ભીમરાવ આંબેડકર",
+                "explanation": "ડૉ. આંબેડકર મુસદ્દા સમિતિના અધ્યક્ષ હતા અને તેમણે બંધારણ નિર્માણમાં મહત્વપૂર્ણ ભૂમિકા ભજવી હતી."
+            },
+            {
+                "question": "ભારતમાં સાંપ્રદાયિક ચૂંટણી પ્રણાલી સૌથી પહેલા કોણે લાગુ કરી હતી?",
+                "options": ["મોર્લે-મિન્ટો સુધાર, 1909", "મોન્ટેગ્યુ-ચેમ્સફોર્ડ સુધાર, 1919", "ભારત સરકાર અધિનિયમ, 1935", "પિટ્સ ઇન્ડિયા એક્ટ, 1784"],
+                "answer": "મોર્લે-મિન્ટો સુધાર, 1909",
+                "explanation": "મોર્લે-મિન્ટો સુધાર 1909 હેઠળ મુસ્લિમો માટે અલગ ચૂંટણી પ્રણાલી લાગુ કરવામાં આવી હતી."
+            },
+            {
+                "question": "કયા નિર્ણયમાં બંધારણની મૂળભૂત સંરચનાનો સિદ્ધાંત નિર્ધારિત કરવામાં આવ્યો?",
+                "options": ["કેશવાનંદ ભારતી કેસ", "ગોલકનાથ કેસ", "મિનર્વા મિલ્સ કેસ", "એ.કે. ગોપાલન કેસ"],
+                "answer": "કેશવાનંદ ભારતી કેસ",
+                "explanation": "1973માં કેશવાનંદ ભારતી કેસમાં સુપ્રીમ કોર્ટે 'મૂળભૂત સંરચના સિદ્ધાંત'ની ઘોષણા કરી, જેનાથી બંધારણની કેટલીક મૂળભૂત વિશેષતાઓને અટલ માનવામાં આવી."
+            },
+            {
+                "question": "ભારતની બંધારણ સભાની પહેલી બેઠક ક્યારે યોજવામાં આવી હતી?",
+                "options": ["9 ડિસેમ્બર, 1946", "11 ડિસેમ્બર, 1946", "13 ડિસેમ્બર, 1946", "26 નવેમ્બર, 1949"],
+                "answer": "9 ડિસેમ્બર, 1946",
+                "explanation": "9 ડિસેમ્બર 1946ના રોજ બંધારણ સભાની પહેલી બેઠક થઈ, જેમાં સચ્ચિદાનંદ સિન્હાને અસ્થાયી અધ્યક્ષ બનાવવામાં આવ્યા."
+            },
+            {
+                "question": "ભારતીય બંધારણને ક્યારે અપનાવવામાં આવ્યું હતું?",
+                "options": ["26 નવેમ્બર 1949", "26 જાન્યુઆરી 1950", "15 ઓગસ્ટ 1947", "9 ડિસેમ્બર 1946"],
+                "answer": "26 નવેમ્બર 1949",
+                "explanation": "બંધારણ સભાએ 26 નવેમ્બર 1949ના રોજ બંધારણને અપનાવ્યું; તેની કેટલીક જોગવાઈઓ તે જ દિવસે અને બાકીની 26 જાન્યુઆરી 1950ના રોજ લાગુ કરવામાં આવી."
+            },
+            {
+                "question": "વિશ્વનું સૌથી લાંબુ લેખિત બંધારણ કયા દેશનું છે?",
+                "options": ["ભારત", "અમેરિકા", "બ્રિટન", "ફ્રાન્સ"],
+                "answer": "ભારત",
+                "explanation": "ભારતનું બંધારણ વિશ્વનું સૌથી લાંબુ લેખિત બંધારણ છે; તેમાં શરૂઆતમાં 395 અનુચ્છેદ, 22 ભાગ અને 8 અનુસૂચિઓ હતી."
+            },
+            {
+                "question": "ભારતમાં બંધારણ દિવસ ક્યારે મનાવવામાં આવે છે?",
+                "options": ["26 નવેમ્બર", "26 જાન્યુઆરી", "15 ઓગસ્ટ", "2 ઓક્ટોબર"],
+                "answer": "26 નવેમ્બર",
+                "explanation": "ભારતમાં 26 નવેમ્બરે બંધારણ દિવસ મનાવવામાં આવે છે; તેની શરૂઆત 2015માં ડૉ. આંબેડકરની 125મી જન્મજયંતીના પ્રસંગે થઈ હતી."
+            },
+            {
+                "question": "ભારતનો સર્વોચ્ચ કાયદો શું માનવામાં આવે છે?",
+                "options": ["ભારતીય બંધારણ", "ભારતીય દંડ સંહિતા (IPC)", "સંસદ દ્વારા બનાવેલ કાયદો", "સુપ્રીમ કોર્ટના નિર્ણયો"],
+                "answer": "ભારતીય બંધારણ",
+                "explanation": "ભારતીય બંધારણ દેશનો સર્વોચ્ચ કાયદો છે, જેને 26 નવેમ્બર 1949ના રોજ અપનાવવામાં આવ્યું અને 26 જાન્યુઆરી 1950થી લાગુ કરવામાં આવ્યું."
+            },
+            {
+                "question": "બંધારણ સભાએ ભારતના રાષ્ટ્રીય ધ્વજને ક્યારે અપનાવ્યો હતો?",
+                "options": ["22 જુલાઈ 1947", "26 જાન્યુઆરી 1950", "15 ઓગસ્ટ 1947", "24 જાન્યુઆરી 1950"],
+                "answer": "22 જુલાઈ 1947",
+                "explanation": "બંધારણ સભાએ 22 જુલાઈ 1947ના રોજ તિરંગાને ભારતના રાષ્ટ્રીય ધ્વજ તરીકે અપનાવ્યો હતો."
+            },
+            {
+                "question": "ભારતનું રાષ્ટ્રીય પ્રતીક ભારત સરકાર દ્વારા ક્યારે અપનાવવામાં આવ્યું હતું?",
+                "options": ["26 જાન્યુઆરી 1950", "22 જુલાઈ 1947", "15 ઓગસ્ટ 1947", "24 જાન્યુઆરી 1950"],
+                "answer": "26 જાન્યુઆરી 1950",
+                "explanation": "સારનાથ સ્થિત અશોક સ્તંભને ભારતના રાષ્ટ્રીય પ્રતીક તરીકે 26 જાન્યુઆરી 1950ના રોજ અપનાવવામાં આવ્યું હતું."
+            },
+            {
+                "question": "ગણતંત્રનો શું અર્થ થાય છે?",
+                "options": ["રાજ્યના વડા જનતા દ્વારા પરોક્ષ રીતે ચૂંટાય છે", "રાજ્યના વડા વંશાનુગત હોય છે", "દેશ પર બ્રિટિશ શાસન છે", "લોકો પાસે કોઈ અધિકાર નથી"],
+                "answer": "રાજ્યના વડા જનતા દ્વારા પરોક્ષ રીતે ચૂંટાય છે",
+                "explanation": "ગણતંત્રમાં સર્વોચ્ચ પદ પર બેઠેલી વ્યક્તિ જનતા દ્વારા પરોક્ષ રીતે ચૂંટાય છે; આ વ્યવસ્થા ફ્રાન્સથી પ્રેરિત છે."
+            },
+            {
+                "question": "સ્વતંત્રતા, સમાનતા અને બંધુત્વના સિદ્ધાંતો કયા દેશમાંથી લેવામાં આવ્યા છે?",
+                "options": ["ફ્રાન્સ", "રશિયા", "અમેરિકા", "જર્મની"],
+                "answer": "ફ્રાન્સ",
+                "explanation": "ફ્રાન્સની ક્રાંતિથી પ્રેરિત સ્વતંત્રતા, સમાનતા અને બંધુત્વના સિદ્ધાંતો ભારતીય બંધારણની પ્રસ્તાવનામાં સામેલ છે."
+            },
+            {
+                "question": "રાજ્યસભાના સભ્યોની પરોક્ષ ચૂંટણીની વ્યવસ્થા કયા દેશમાંથી લેવામાં આવી છે?",
+                "options": ["દક્ષિણ આફ્રિકા", "ઓસ્ટ્રેલિયા", "જાપાન", "આયર્લેન્ડ"],
+                "answer": "દક્ષિણ આફ્રિકા",
+                "explanation": "ભારતીય બંધારણમાં રાજ્યસભાના સભ્યોની પરોક્ષ ચૂંટણીની વ્યવસ્થા દક્ષિણ આફ્રિકાના બંધારણમાંથી લેવામાં આવી છે."
+            },
+            {
+                "question": "કટોકટીના સમયે મૂળભૂત અધિકારોના નિલંબનની જોગવાઈ કયા દેશમાંથી લેવામાં આવી છે?",
+                "options": ["જર્મની", "ફ્રાન્સ", "કેનેડા", "બ્રિટન"],
+                "answer": "જર્મની",
+                "explanation": "જર્મનીના વીમર બંધારણમાંથી કટોકટીમાં મૂળભૂત અધિકારોના નિલંબનની જોગવાઈ ભારતીય બંધારણમાં સામેલ કરવામાં આવી છે."
+            },
+            {
+                "question": "પંચવર્ષીય યોજનાની જોગવાઈ ભારતીય બંધારણમાં કયા દેશમાંથી લેવામાં આવી છે?",
+                "options": ["સોવિયેત સંઘ (USSR)", "અમેરિકા", "ચીન", "બ્રિટન"],
+                "answer": "સોવિયેત સંઘ (USSR)",
+                "explanation": "ભારતમાં પંચવર્ષીય યોજનાઓની અવધારણા USSR (રશિયા) થી લેવામાં આવી છે; પહેલી યોજના 1951માં શરૂ કરવામાં આવી હતી."
+            },
+            {
+                "question": "ભારતીય બંધારણમાં મૌલિક કર્તવ્યોની અવધારણા કયા દેશમાંથી લેવામાં આવી છે?",
+                "options": ["સોવિયેત સંઘ", "અમેરિકા", "ફ્રાન્સ", "જાપાન"],
+                "answer": "સોવિયેત સંઘ",
+                "explanation": "મૌલિક કર્તવ્યો 42મા બંધારણીય સુધારા (1976) દ્વારા સ્વર્ણ સિંહ સમિતિની ભલામણ પર સોવિયેત સંઘના બંધારણમાંથી લેવામાં આવ્યા અને અનુચ્છેદ 51A માં જોડવામાં આવ્યા."
+            },
+            {
+                "question": "તેલંગાણા રાજ્ય કયા રાજ્યથી અલગ થઈને બન્યું હતું?",
+                "options": ["આંધ્ર પ્રદેશ", "કર્ણાટક", "તમિલનાડુ", "મહારાષ્ટ્ર"],
+                "answer": "આંધ્ર પ્રદેશ",
+                "explanation": "તેલંગાણા 2 જૂન 2014ના રોજ આંધ્ર પ્રદેશથી અલગ થઈને ભારતનું 29મું રાજ્ય બન્યું હતું; તે તેલુગુ ભાષી ક્ષેત્ર છે."
+            },
+            {
+                "question": "મહારાષ્ટ્ર અને ગુજરાતની રચના કયા વર્ષે થઈ હતી?",
+                "options": ["1960", "1956", "1966", "1972"],
+                "answer": "1960",
+                "explanation": "1 મે 1960ના રોજ બોમ્બે પુનર્ગઠન અધિનિયમ હેઠળ મહારાષ્ટ્ર અને ગુજરાત બે અલગ-અલગ રાજ્યો તરીકે અસ્તિત્વમાં આવ્યા."
+            },
+            {
+                "question": "સંઘ સૂચિ, રાજ્ય સૂચિ અને સમવર્તી સૂચિ ભારતીય બંધારણની કઈ અનુસૂચિમાં સામેલ છે?",
+                "options": ["સાતમી અનુસૂચિ", "આઠમી અનુસૂચિ", "નવમી અનુસૂચિ", "દસમી અનુસૂચિ"],
+                "answer": "સાતમી અનુસૂચિ",
+                "explanation": "સાતમી અનુસૂચિમાં સંઘ સૂચિ, રાજ્ય સૂચિ અને સમવર્તી સૂચિ હેઠળ વિષયોનું વિભાજન કરવામાં આવ્યું છે."
+            },
+            {
+                "question": "રાજ્યને ગ્રામ પંચાયતોના સંગઠન માટે પ્રયાસ કરવાની વાત બંધારણના કયા અનુચ્છેદમાં કરવામાં આવી છે?",
+                "options": ["અનુચ્છેદ 40", "અનુચ્છેદ 44", "અનુચ્છેદ 48", "અનુચ્છેદ 50"],
+                "answer": "અનુચ્છેદ 40",
+                "explanation": "અનુચ્છેદ 40 રાજ્યને ગ્રામ પંચાયતોની રચના માટે પ્રયાસ કરવા કહે છે; આ એક નીતિ નિર્દેશક સિદ્ધાંત છે."
+            },
+            {
+                "question": "નાણાકીય કટોકટી સંબંધિત જોગવાઈ બંધારણના કયા અનુચ્છેદમાં છે?",
+                "options": ["અનુચ્છેદ 360", "અનુચ્છેદ 352", "અનુચ્છેદ 356", "અનુચ્છેદ 368"],
+                "answer": "અનુચ્છેદ 360",
+                "explanation": "અનુચ્છેદ 360 રાષ્ટ્રપતિને એ અધિકાર આપે છે કે તેઓ નાણાકીય સ્થિરતા પર સંકટની સ્થિતિમાં નાણાકીય કટોકટી જાહેર કરી શકે છે."
+            },
+            {
+                "question": "ભારતીય બંધારણનો અનુચ્છેદ 368 કોની સાથે સંબંધિત છે?",
+                "options": ["બંધારણના સુધારા", "નવા રાજ્યોની રચના", "મૌલિક અધિકારો", "કટોકટીની જોગવાઈઓ"],
+                "answer": "બંધારણના સુધારા",
+                "explanation": "અનુચ્છેદ 368 બંધારણમાં સુધારાની પ્રક્રિયાને સ્પષ્ટ કરે છે અને તે બંધારણના ભાગ XX માં આવે છે."
+            },
+            {
+                "question": "સંસદના સત્ર ન હોય ત્યારે વટહુકમ જારી કરવાની રાષ્ટ્રપતિની શક્તિ કયા અનુચ્છેદમાં આપવામાં આવી છે?",
+                "options": ["અનુચ્છેદ 123", "અનુચ્છેદ 111", "અનુચ્છેદ 72", "અનુચ્છેદ 85"],
+                "answer": "અનુચ્છેદ 123",
+                "explanation": "અનુચ્છેદ 123 રાષ્ટ્રપતિને વટહુકમ જારી કરવાની શક્તિ આપે છે, જેનો પ્રભાવ સંસદના અધિનિયમ સમાન હોય છે."
+            },
+            {
+                "question": "ભારતને એક ધર્મનિરપેક્ષ રાજ્ય તરીકે ક્યાં વર્ણવવામાં આવ્યું છે?",
+                "options": ["બંધારણની પ્રસ્તાવના", "મૌલિક અધિકારો", "રાજ્યના નીતિ નિર્દેશક તત્વો", "નવમી અનુસૂચિ"],
+                "answer": "બંધારણની પ્રસ્તાવના",
+                "explanation": "બંધારણની પ્રસ્તાવનામાં ભારતને 'પંથનિરપેક્ષ' રાષ્ટ્ર ઘોષિત કરવામાં આવ્યું છે."
+            },
+            {
+                "question": "ભારતીય બંધારણના અનુચ્છેદ 5 થી 11 કોની સાથે સંબંધિત છે?",
+                "options": ["નાગરિકતા", "મૌલિક અધિકારો", "સંઘ અને તેના પ્રદેશો", "રાજ્યના નીતિ નિર્દેશક તત્વો"],
+                "answer": "નાગરિકતા",
+                "explanation": "બંધારણના ભાગ II (અનુચ્છેદ 5 થી 11) માં નાગરિકતા સંબંધિત જોગવાઈઓ આપવામાં આવી છે."
+            },
+            {
+                "question": "ભારતીય બંધારણનો કયો અનુચ્છેદ અસ્પૃશ્યતાના ઉન્મૂલન સાથે સંબંધિત છે?",
+                "options": ["અનુચ્છેદ 17", "અનુચ્છેદ 18", "અનુચ્છેદ 19", "અનુચ્છેદ 16"],
+                "answer": "અનુચ્છેદ 17",
+                "explanation": "અનુચ્છેદ 17 અસ્પૃશ્યતાને સમાપ્ત કરે છે અને તેને દંડનીય અપરાધ જાહેર કરે છે."
+            },
+            {
+                "question": "બંદી પ્રત્યક્ષીકરણની રિટ જારી કરવાની શક્તિ કોની પાસે છે?",
+                "options": ["સર્વોચ્ચ ન્યાયાલય અને ઉચ્ચ ન્યાયાલય", "ફક્ત સર્વોચ્ચ ન્યાયાલય", "ફક્ત ઉચ્ચ ન્યાયાલય", "જિલ્લા ન્યાયાલય"],
+                "answer": "સર્વોચ્ચ ન્યાયાલય અને ઉચ્ચ ન્યાયાલય",
+                "explanation": "અનુચ્છેદ 32 (SC) અને અનુચ્છેદ 226 (HC) હેઠળ રિટ જારી કરવામાં આવે છે."
+            },
+            {
+                "question": "ભારતીય બંધારણ મુજબ કેટલી ઉંમર સુધીના બાળકોને મફત અને ફરજિયાત શિક્ષણ મેળવવાનો અધિકાર છે?",
+                "options": ["14 વર્ષ", "18 વર્ષ", "6 વર્ષ", "12 વર્ષ"],
+                "answer": "14 વર્ષ",
+                "explanation": "અનુચ્છેદ 21A (86મો સુધારો, 2002) મુજબ 6-14 વર્ષના બાળકોને શિક્ષણ મૌલિક અધિકાર છે."
+            },
+            {
+                "question": "નીચેનામાંથી કોને ભારતીય બંધારણની આત્મા તરીકે વર્ણવવામાં આવ્યું છે?",
+                "options": ["બંધારણીય ઉપચારોનો અધિકાર (અનુચ્છેદ 32)", "પ્રસ્તાવના", "રાજ્યના નીતિ નિર્દેશક તત્વો", "મૌલિક કર્તવ્યો"],
+                "answer": "બંધારણીય ઉપચારોનો અધિકાર (અનુચ્છેદ 32)",
+                "explanation": "ડૉ. ભીમરાવ આંબેડકરે અનુચ્છેદ 32 (બંધારણીય ઉપચારોનો અધિકાર) ને બંધારણની આત્મા કહ્યું છે."
+            },
+            {
+                "question": "'નિઃશુલ્ક અને ફરજિયાત શિક્ષણનો અધિકાર અધિનિયમ' સંસદ દ્વારા કયા વર્ષે પસાર થયો?",
+                "options": ["2009", "2002", "2010", "2005"],
+                "answer": "2009",
+                "explanation": "આ અધિનિયમ 1 એપ્રિલ 2010થી લાગુ થયો અને અનુચ્છેદ 21A હેઠળ શિક્ષણને મૌલિક અધિકાર બનાવવામાં આવ્યો."
+            },
+            {
+                "question": "નાગરિકો માટે સમાન નાગરિક સંહિતા સુનિશ્ચિત કરનાર અનુચ્છેદ કયો છે?",
+                "options": ["અનુચ્છેદ 44", "અનુચ્છેદ 40", "અનુચ્છેદ 48A", "અનુચ્છેદ 51"],
+                "answer": "અનુચ્છેદ 44",
+                "explanation": "તે રાજ્યને નિર્દેશ આપે છે કે બધા નાગરિકો માટે એક સમાન કાયદો લાગુ કરવાનો પ્રયાસ કરે."
+            },
+            {
+                "question": "ભારતની સંપ્રભુતા, એકતા અને અખંડિતતાની રક્ષા કરવી શું છે?",
+                "options": ["મૌલિક કર્તવ્ય", "મૌલિક અધિકાર", "રાજ્યનો નીતિ નિર્દેશક સિદ્ધાંત", "કાનૂની અધિકાર"],
+                "answer": "મૌલિક કર્તવ્ય",
+                "explanation": "આ અનુચ્છેદ 51A (c) હેઠળ દરેક નાગરિકનું કર્તવ્ય છે."
+            },
+            {
+                "question": "ભારતમાં મુખ્ય ચૂંટણી કમિશનરની નિમણૂક કોણ કરે છે?",
+                "options": ["ભારતના રાષ્ટ્રપતિ", "વડાપ્રધાન", "ભારતના મુખ્ય ન્યાયાધીશ", "લોકસભાના સ્પીકર"],
+                "answer": "ભારતના રાષ્ટ્રપતિ",
+                "explanation": "ચૂંટણી પંચના તમામ કમિશનરોની નિમણૂક રાષ્ટ્રપતિ દ્વારા કરવામાં આવે છે (અનુ. 324)."
+            },
+            {
+                "question": "સંસદમાં રાષ્ટ્રપતિના વિશેષ અભિભાષણની જોગવાઈ કયા અનુચ્છેદમાં છે?",
+                "options": ["અનુચ્છેદ 87", "અનુચ્છેદ 86", "અનુચ્છેદ 108", "અનુચ્છેદ 123"],
+                "answer": "અનુચ્છેદ 87",
+                "explanation": "રાષ્ટ્રપતિ લોકસભા ચૂંટણી પછીના પ્રથમ સત્રમાં સંસદના બંને ગૃહોને અભિભાષણ આપે છે."
+            }
+        ];
+
+        const questionTextEl = document.getElementById('question-text');
+        const optionsContainerEl = document.getElementById('options-container');
+        const explanationContainerEl = document.getElementById('explanation-container');
+        const explanationTextEl = document.getElementById('explanation-text');
+        const scoreEl = document.getElementById('score');
+        const questionCounterEl = document.getElementById('question-counter');
+        const nextBtn = document.getElementById('next-btn');
+        const prevBtn = document.getElementById('prev-btn');
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let userAnswers = new Array(quizData.length).fill(null);
+
+        function loadQuestion() {
+            // Reset previous state
+            explanationContainerEl.classList.add('hidden');
+            optionsContainerEl.innerHTML = '';
+
+            const currentQuestion = quizData[currentQuestionIndex];
+            questionTextEl.innerText = `${currentQuestionIndex + 1}. ${currentQuestion.question}`;
+            
+            // Shuffle options to make it more challenging
+            const shuffledOptions = [...currentQuestion.options].sort(() => Math.random() - 0.5);
+
+            shuffledOptions.forEach(option => {
+                const button = document.createElement('button');
+                button.innerText = option;
+                button.classList.add('option-btn');
+                button.addEventListener('click', () => selectAnswer(option, button));
+                optionsContainerEl.appendChild(button);
+            });
+
+            updateNavigation();
+            restoreAnswerState();
+        }
+
+        function selectAnswer(selectedOption, selectedButton) {
+            if (userAnswers[currentQuestionIndex] !== null) return; // Prevent re-answering
+
+            const currentQuestion = quizData[currentQuestionIndex];
+            const isCorrect = selectedOption === currentQuestion.answer;
+            
+            userAnswers[currentQuestionIndex] = { selected: selectedOption, isCorrect: isCorrect };
+
+            if (isCorrect) {
+                score += 1;
+            } else {
+                score -= 0.25;
+            }
+
+            updateScore();
+            showFeedback();
+        }
+        
+        function showFeedback() {
+            const currentQuestion = quizData[currentQuestionIndex];
+            const userAnswer = userAnswers[currentQuestionIndex];
+
+            Array.from(optionsContainerEl.children).forEach(button => {
+                const optionText = button.innerText;
+                if (optionText === currentQuestion.answer) {
+                    button.classList.add('correct');
+                } else if (optionText === userAnswer.selected && !userAnswer.isCorrect) {
+                    button.classList.add('incorrect');
+                }
+                button.disabled = true;
+            });
+
+            explanationTextEl.innerText = currentQuestion.explanation;
+            explanationContainerEl.classList.remove('hidden');
+        }
+        
+        function restoreAnswerState() {
+            if (userAnswers[currentQuestionIndex] !== null) {
+                showFeedback();
+            }
+        }
+
+        function updateScore() {
+            scoreEl.innerText = `સ્કોર: ${score.toFixed(2)}`;
+        }
+
+        function updateNavigation() {
+            questionCounterEl.innerText = `પ્રશ્ન ${currentQuestionIndex + 1} / ${quizData.length}`;
+            prevBtn.disabled = currentQuestionIndex === 0;
+            nextBtn.disabled = currentQuestionIndex === quizData.length - 1;
+        }
+
+        nextBtn.addEventListener('click', () => {
+            if (currentQuestionIndex < quizData.length - 1) {
+                currentQuestionIndex++;
+                loadQuestion();
+            }
+        });
+
+        prevBtn.addEventListener('click', () => {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                loadQuestion();
+            }
+        });
+
+        // Initial Load
+        loadQuestion();
+
+    </script>
+</body>
+</html>
